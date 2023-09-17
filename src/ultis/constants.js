@@ -8,7 +8,7 @@ export const BUTTON_COLOR = {
 
 export const customFontList = [
   {
-    fontFamily: "ManateeSolid",
+    fontFamily: "JandaManateeSolid",
     fontUrl: "JandaManateeSolid.ttf",
     fontStretch: "condensed",
   },
@@ -21,17 +21,45 @@ export const customFontList = [
     fontFamily: "facebook",
     fontUrl: "facebook.ttf",
     fontStretch: "condensed",
-  }
+  },
 
   {
     fontFamily: "coolvetica_rg",
     fontUrl: "coolvetica_rg.otf",
     fontStretch: "condensed",
-  }
+  },
 
+  {
+    fontFamily: "Lobster-Regular",
+    fontUrl: "Lobster-Regular.ttf",
+    fontStretch: "condensed",
+  },
   {
     fontFamily: "Roboto-BoldItalic",
     fontUrl: "Roboto-BoldItalic.ttf",
+    fontStretch: "condensed",
+  },
+
+  {
+    fontFamily: "RobotoSlab-VariableFont_wght",
+    fontUrl: "RobotoSlab-VariableFont_wght.ttf",
+    fontStretch: "condensed",
+  },
+
+  {
+    fontFamily: "Rowdies-Regular",
+    fontUrl: "RRowdies-Regular.ttf",
+    fontStretch: "condensed",
+  },
+
+  {
+    fontFamily: "Rowdies-Light",
+    fontUrl: "Rowdies-Light.ttf",
+    fontStretch: "condensed",
+  },
+  {
+    fontFamily: "Rowdies-Bold",
+    fontUrl: "Rowdies-Bold.ttf",
     fontStretch: "condensed",
   }
 
