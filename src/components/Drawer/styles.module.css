@@ -1,0 +1,25 @@
+.slideLeft {
+    animation: slideLeftAnimation 0.5s ease-in-out forwards;
+}
+
+@keyframes slideLeftAnimation {
+    0% {
+        transform: translateX(0); /* Bắt đầu từ vị trí hiện tại */
+    }
+    100% {
+        transform: translateX(-100%); /* Di chuyển sang trái 100% chiều rộng của phần tử */
+    }
+}
+
+.slideRight {
+    animation: slideRightAnimation 0.5s ease-in-out forwards;
+}
+
+@keyframes slideRightAnimation {
+    0% {
+        transform: translateX(0); /* Bắt đầu từ vị trí hiện tại */
+    }
+    100% {
+        transform: translateX(100%); /* Di chuyển sang phải 100% chiều rộng của phần tử */
+    }
+}
