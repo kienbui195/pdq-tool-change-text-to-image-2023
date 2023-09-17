@@ -13,6 +13,9 @@ const Button = ({ title, onClick, type = "primary" }) => {
         cursor: "pointer",
         opacity: hover ? 0.7 : 1,
         boxShadow: hover ? "2px 2px 2px #000" : "none",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
       }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}

@@ -3,37 +3,90 @@ import Button from "./components/Button";
 import Drawer from "./components/Drawer";
 import { customFontList } from "./ultis/constants";
 import { loadCustomFonts } from "./ultis/function";
+import Input from "./components/Input";
+import FormInput from "./layouts/FormInput";
+import Textarea from "./components/Textarea";
 
 const App = () => {
-  const [numberInput, setNumberInput] = useState("");
-  const [form, setForm] = useState([]);
+  const [numberInput, setNumberInput] = useState(0);
   const [modal, setModal] = useState(false);
   const [canvas, setCanvas] = useState([]);
-  const [font, setFont] = useState(customFontList[0].fontFamily)
   const [setting, setSetting] = useState({
-    color: '',
-    lineWidth: 1.5,
-    borderColor: ''
-  })
+    item1: {
+      setting: {
+        font: customFontList[0].fontFamily,
+        color: "",
+        lineWidth: 0.5,
+        borderColor: "",
+      },
+      items: [],
+    },
+    item2: {
+      setting: { font: customFontList[0].fontFamily, color: "", lineWidth: 0.5, borderColor: "" },
+      items: [],
+    },
+    item3: {
+      setting: { font: customFontList[0].fontFamily, color: "", lineWidth: 0.5, borderColor: "" },
+      items: [],
+    },
+    item4: {
+      setting: { font: customFontList[0].fontFamily, color: "", lineWidth: 0.5, borderColor: "" },
+      items: [],
+    },
+  });
 
   const handleAddField = () => {
     if (+numberInput > 0) {
       let array = [];
       for (let i = 0; i < +numberInput; i++) {
-        array.push({ id: i, value: "", error: "", canvas: "" });
+        array.push({ id: i, value: "", error: "" });
       }
-      setForm(array);
-    } else {
-      setForm([]);
+      setSetting({
+        ...setting,
+        item1: {
+          ...setting.item1,
+          items: array,
+        },
+        item2: {
+          ...setting.item2,
+          items: array,
+        },
+        item3: {
+          ...setting.item3,
+          items: array,
+        },
+        item4: {
+          ...setting.item4,
+          items: array,
+        },
+      });
     }
   };
 
+  const handleChange = (val, stateName, item, idx) => {
+    setSetting({
+      ...setting,
+      [item]: {
+        ...setting[item],
+        items: setting[item].items.map((_i, _idx) => (_idx === idx ? { ..._i, [stateName]: val } : _i)),
+      },
+    });
+  };
 
+  const handleSaveSettings = (val, item) => {
+    setSetting({
+      ...setting,
+      [item]: {
+        ...setting[item],
+        setting: val,
+      },
+    });
+  };
 
-  const drawCanvas = () => {
+  const drawCanvas = (list, font, color, lineWidth, borderColor) => {
     const canvasList = [];
 
-    form.forEach((item, idx) => {
+    list.forEach((item, idx) => {
       const { value } = item;
 
       if (value.trim() !== "") {
@@ -45,10 +98,10 @@ const App = () => {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.font = `italic bold 50px ${font}, Arial`;
-        ctx.fillStyle = `${setting.color}`;
-        ctx.strokeStyle = setting.borderColor;
-        ctx.textSpacing = 1
-        ctx.lineWidth = +setting.lineWidth;
+        ctx.fillStyle = color;
+        ctx.strokeStyle = borderColor;
+        ctx.textSpacing = 1;
+        ctx.lineWidth = +lineWidth;
         const maxTextWidth = 700;
         let textX = canvas.width / 2; // Vị trí can giữa ngang
         let textY = canvas.height / 2; // Vị trí can giữa theo chiều dọc
@@ -89,27 +142,64 @@ const App = () => {
 
   const checkError = () => {
     let flag = [];
-    form.forEach((item) => {
-      if (item.value.length > 75) {
-        flag.push(1);
-      }
-    });
+
+    const checkItems = (items) => {
+      items.forEach((_i) => {
+        if (_i.value.length > 75) {
+          flag.push(1);
+        }
+      });
+    };
+
+    checkItems(setting.item1.items);
+    checkItems(setting.item2.items);
+    checkItems(setting.item3.items);
+    checkItems(setting.item4.items);
+
     return flag.length > 0;
   };
 
   const handleCreate = () => {
+    const canvasList = [];
+
     if (checkError()) {
-      setForm((prev) =>
-        prev.map((item, i) => (item.value.length > 75 ? { ...item, error: "Bạn cần nhập ít hơn 75 kí tự" } : item))
-      );
+      const updatedSetting = { ...setting };
+
+      // Function to handle errors and update the error message
+      const handleItemError = (item) => {
+        if (item.value.length > 75) {
+          return { ...item, error: "Bạn cần nhập ít hơn 75 kí tự" };
+        }
+        return item;
+      };
+
+      // Loop through and update item arrays
+      ["item1", "item2", "item3", "item4"].forEach((itemKey) => {
+        updatedSetting[itemKey].items = updatedSetting[itemKey].items.map(handleItemError);
+      });
+
+      setSetting(updatedSetting);
     } else {
-      let canvas = [];
-      form.forEach((item) => {
-        if (item.value !== "") {
-          canvas.push();
+      ["item1", "item2", "item3", "item4"].forEach((itemKey) => {
+        const canvas = [];
+        setting[itemKey].items.forEach((item) => {
+          if (item.value !== "") {
+            canvas.push(item);
+          }
+        });
+        const draw = drawCanvas(
+          canvas,
+          setting[itemKey].setting.font,
+          setting[itemKey].setting.color,
+          setting[itemKey].setting.lineWidth,
+          setting[itemKey].setting.borderColor
+        );
+        if (draw.length > 0) {
+          canvasList.push(...draw);
         }
       });
-      setCanvas(drawCanvas());
+
+      setCanvas(canvasList);
       setModal(true);
     }
   };
@@ -132,76 +222,126 @@ const App = () => {
         <h2>Text to png converter</h2>
       </div>
       <div style={{ display: "flex", flexDirection: "column" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <label>
-            <span style={{ marginRight: "8px" }}>Nhập số ô text:</span>
-            <input
-              type="number"
-              placeholder="chọn từ 0 đến 10"
-              value={numberInput}
-              onChange={(ev) => setNumberInput(ev.target.value)}
-            />
-          </label>
+        <div
+          style={{ display: "grid", gridTemplateColumns: `auto auto ${setting.item1.items.length > 0 ? "auto" : ""}` }}
+        >
+          <Input title="Nhập số hàng" value={numberInput} onChange={(val) => setNumberInput(val)} />
           <Button title={"Tạo"} onClick={handleAddField} />
-          {form.length > 0 && <Button type="success" title={"Converter"} onClick={handleCreate} />}
-          <select onChange={(ev) => {
-            setFont(ev.target.value)
-          }}>
-            {customFontList.map((item, idx) => {
-              const { fontFamily } = item
-              return (
-                <option key={idx} value={fontFamily} selected={font === fontFamily}>{fontFamily}</option>
-              )
-            })}
-          </select>
-          <label style={{display: 'flex' , alignItems: 'center',  marginLeft: '8px'}}>
-            <p>Màu chữ</p>
-            <input style={{ marginLeft: '8px' }} type="color" value={setting.color} onChange={(ev) => {
-              setSetting({
-                ...setting,
-                color: ev.target.value
-              })
-            }} />
-          </label>
-          <input style={{ marginLeft: '8px' }} placeholder="Độ rộng viền" type="number" value={setting.lineWidth} onChange={ev => {
-            setSetting({
-              ...setting,
-              lineWidth: ev.target.value
-            })
-          }} />
-          <label style={{display: 'flex' , alignItems: 'center',  marginLeft: '8px'}}>
-            <p>Màu viền</p>
-            <input style={{ marginLeft: '8px' }} placeholder="Màu Viền" type="color" value={setting.borderColor} onChange={ev => {
-              setSetting({
-                ...setting,
-                borderColor: ev.target.value
-              })
-            }} />
-          </label>
+          {setting.item1.items.length > 0 && <Button type="success" title={"Converter"} onClick={handleCreate} />}
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "auto auto", gap: "8px" }}>
-          {form.map((_i, idx) => {
-            const { id, value, error } = _i;
-            return (
-              <div key={id} style={{ display: "flex", flexDirection: "column" }}>
-                <textarea
-                  style={{
-                    minHeight: "60px",
-                    padding: "10px",
-                    border: error ? `1px solid red` : "1px solid gray",
-                  }}
-                  value={value}
-                  onChange={(ev) =>
-                    setForm((prev) => prev.map((item, i) => (i === idx ? { ...item, value: ev.target.value } : item)))
-                  }
-                  onFocus={() =>
-                    setForm((prev) => prev.map((_it, _idx) => (_idx === idx ? { ..._it, error: "" } : _it)))
-                  }
-                />
-                {error && <span style={{ color: "red", fontSize: "14px" }}>Cần nhập ít hơn 75 kí tự</span>}
-              </div>
-            );
-          })}
+        <div style={{ display: "grid", gridTemplateColumns: "auto auto auto auto", gap: "8px" }}>
+          {setting.item1.items.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "stretch" }}>
+              <FormInput
+                onChange={(val) => {
+                  handleSaveSettings(val, "item1");
+                }}
+              />
+              {setting.item1.items.map((_i, idx) => {
+                const { id, error, value } = _i;
+                return (
+                  <Textarea
+                    error={error}
+                    key={id}
+                    value={value}
+                    onChange={(val) => {
+                      handleChange(val, "value", "item1", idx);
+                    }}
+                    onFocus={() =>
+                      setSetting({
+                        ...setting,
+                        item1: {
+                          ...setting.item1,
+                          items: setting.item1.items.map((_it, _idx) => (_idx === idx ? { ..._it, error: "" } : _it)),
+                        },
+                      })
+                    }
+                  />
+                );
+              })}
+            </div>
+          )}
+          {setting.item2.items.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "stretch" }}>
+              <FormInput onChange={(val) => handleSaveSettings(val, "item2")} />
+              {setting.item2.items.map((_i, idx) => {
+                const { id, error, value } = _i;
+                return (
+                  <Textarea
+                    error={error}
+                    key={id}
+                    value={value}
+                    onChange={(val) => {
+                      handleChange(val, "value", "item2", idx);
+                    }}
+                    onFocus={() =>
+                      setSetting({
+                        ...setting,
+                        item2: {
+                          ...setting.item2,
+                          items: setting.item2.items.map((_it, _idx) => (_idx === idx ? { ..._it, error: "" } : _it)),
+                        },
+                      })
+                    }
+                  />
+                );
+              })}
+            </div>
+          )}
+          {setting.item3.items.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "stretch" }}>
+              <FormInput onChange={(val) => handleSaveSettings(val, "item3")} />
+              {setting.item3.items.map((_i, idx) => {
+                const { id, error, value } = _i;
+                return (
+                  <Textarea
+                    error={error}
+                    key={id}
+                    value={value}
+                    onChange={(val) => {
+                      handleChange(val, "value", "item3", idx);
+                    }}
+                    onFocus={() =>
+                      setSetting({
+                        ...setting,
+                        item3: {
+                          ...setting.item3,
+                          items: setting.item3.items.map((_it, _idx) => (_idx === idx ? { ..._it, error: "" } : _it)),
+                        },
+                      })
+                    }
+                  />
+                );
+              })}
+            </div>
+          )}
+          {setting.item4.items.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "stretch" }}>
+              <FormInput onChange={(val) => handleSaveSettings(val, "item4")} />
+              {setting.item4.items.map((_i, idx) => {
+                const { id, error, value } = _i;
+                return (
+                  <Textarea
+                    error={error}
+                    key={id}
+                    value={value}
+                    onChange={(val) => {
+                      handleChange(val, "value", "item4", idx);
+                    }}
+                    onFocus={() =>
+                      setSetting({
+                        ...setting,
+                        item4: {
+                          ...setting.item4,
+                          items: setting.item4.items.map((_it, _idx) => (_idx === idx ? { ..._it, error: "" } : _it)),
+                        },
+                      })
+                    }
+                  />
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
       <Drawer
@@ -218,7 +358,7 @@ const App = () => {
               flexDirection: "column",
               overflow: "hidden",
               overflowY: "auto",
-              maxHeight: "480px",
+              maxHeight: "600px",
             }}
           >
             {canvas.map((item, i) => {

@@ -5,7 +5,6 @@ export const BUTTON_COLOR = {
   primary: "linear-gradient(0deg, rgba(34,193,195,1) 0%, rgba(253,187,45,1) 100%)",
 };
 
-
 export const customFontList = [
   {
     fontFamily: "ManateeSolid",
@@ -21,18 +20,17 @@ export const customFontList = [
     fontFamily: "facebook",
     fontUrl: "facebook.ttf",
     fontStretch: "condensed",
-  }
+  },
 
   {
     fontFamily: "coolvetica_rg",
     fontUrl: "coolvetica_rg.otf",
     fontStretch: "condensed",
-  }
+  },
 
   {
     fontFamily: "Roboto-BoldItalic",
     fontUrl: "Roboto-BoldItalic.ttf",
     fontStretch: "condensed",
-  }
-
+  },
 ];
