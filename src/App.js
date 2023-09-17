@@ -83,58 +83,62 @@ const App = () => {
     });
   };
 
-  const drawCanvas = (list, font, color, lineWidth, borderColor) => {
+  const drawCanvas = (list, font, color, lineWidth, borderColor, name) => {
     const canvasList = [];
 
     list.forEach((item, idx) => {
       const { value } = item;
 
-      if (value.trim() !== "") {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        canvas.width = 800;
-        canvas.height = 260;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.font = `italic bold 50px ${font}, Arial`;
-        ctx.fillStyle = color;
-        ctx.strokeStyle = borderColor;
-        ctx.textSpacing = 1;
-        ctx.lineWidth = +lineWidth;
-        const maxTextWidth = 700;
-        let textX = canvas.width / 2; // Vị trí can giữa ngang
-        let textY = canvas.height / 2; // Vị trí can giữa theo chiều dọc
-        const words = value.split(" ");
-        let line = "";
-        for (const word of words) {
-          const testLine = line + (line === "" ? "" : " ") + word;
-          const testLineWidth = ctx.measureText(testLine).width;
+      // if (value.trim() !== "") {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = 800;
+      canvas.height = 260;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = `italic bold 50px ${font}, Arial`;
+      ctx.fillStyle = color;
+      ctx.strokeStyle = borderColor;
+      ctx.textSpacing = 1;
+      ctx.lineWidth = +lineWidth;
+      const maxTextWidth = 700;
+      let textX = canvas.width / 2; // Vị trí can giữa ngang
+      let textY = canvas.height / 2; // Vị trí can giữa theo chiều dọc
+      const words = value.split(" ");
+      let line = "";
+      for (const word of words) {
+        const testLine = line + (line === "" ? "" : " ") + word;
+        const testLineWidth = ctx.measureText(testLine).width;
 
-          if (testLineWidth > maxTextWidth) {
-            ctx.fillText(line, textX, textY);
-            ctx.strokeText(line, textX, textY);
-            line = word;
-            textY += 50;
-          } else {
-            line = testLine;
-          }
+        if (testLineWidth > maxTextWidth) {
+          ctx.fillText(line, textX, textY);
+          ctx.strokeText(line, textX, textY);
+          line = word;
+          textY += 50;
+        } else {
+          line = testLine;
         }
-        ctx.fillText(line, textX, textY);
-        ctx.strokeText(line, textX, textY);
-        const dataURL = canvas.toDataURL("image/png");
-
-        canvasList.push(
-          <div key={idx} style={{ border: "2px solid black", boxSizing: "border-box" }}>
-            <img src={dataURL} alt={`Text ${idx}`} style={{ backgroundColor: "transparent", width: "100%" }} />
-            <div style={{ textAlign: "center" }}>
-              <a href={dataURL} download={`text_${idx}.png`}>
-                Tải về
-              </a>
-            </div>
-          </div>
-        );
       }
+      ctx.fillText(line, textX, textY);
+      ctx.strokeText(line, textX, textY);
+      const dataURL = canvas.toDataURL("image/png");
+
+      canvasList.push(
+        <div key={idx} style={{ border: "2px solid black", boxSizing: "border-box" }}>
+          <img
+            src={dataURL}
+            alt={`Text ${idx}`}
+            style={{ backgroundColor: "transparent", width: "100%", objectFit: "cover" }}
+          />
+          <div style={{ textAlign: "center" }}>
+            <a href={dataURL} download={`${name}${idx}.png`}>
+              {`${name}${idx}`}
+            </a>
+          </div>
+        </div>
+      );
+      // }
     });
 
     return canvasList;
@@ -183,16 +187,15 @@ const App = () => {
       ["item1", "item2", "item3", "item4"].forEach((itemKey) => {
         const canvas = [];
         setting[itemKey].items.forEach((item) => {
-          if (item.value !== "") {
-            canvas.push(item);
-          }
+          canvas.push(item);
         });
         const draw = drawCanvas(
           canvas,
           setting[itemKey].setting.font,
           setting[itemKey].setting.color,
           setting[itemKey].setting.lineWidth,
-          setting[itemKey].setting.borderColor
+          setting[itemKey].setting.borderColor,
+          `${itemKey}`
         );
         if (draw.length > 0) {
           canvasList.push(...draw);
@@ -354,11 +357,12 @@ const App = () => {
           <div
             style={{
               padding: "16px",
-              display: "flex",
-              flexDirection: "column",
+              display: "grid",
               overflow: "hidden",
               overflowY: "auto",
               maxHeight: "600px",
+              gridTemplateColumns: "auto auto auto auto",
+              gap: "2px",
             }}
           >
             {canvas.map((item, i) => {

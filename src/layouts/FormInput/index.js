@@ -22,7 +22,7 @@ const FormInput = ({ onChange }) => {
 
   return (
     <div style={{ background: "wheat", padding: "4px", borderRadius: "4px" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "auto auto", gap: "8px" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         <SelectOne
           listData={fonts}
           value={setting.font}
@@ -34,6 +34,8 @@ const FormInput = ({ onChange }) => {
           value={setting.lineWidth}
           onChange={(val) => handleChange(val, "lineWidth")}
         />
+      </div>
+      <div style={{ display: "flex", justifyContent: "center", gap: "8x" }}>
         <Input title={"Màu chữ"} type={"color"} value={setting.color} onChange={(val) => handleChange(val, "color")} />
         <Input
           title={"Màu viền"}
